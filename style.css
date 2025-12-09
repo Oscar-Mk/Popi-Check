@@ -1,0 +1,44 @@
+/* Custom scrollbar for tables and main content */
+.scroller::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.scroller::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.scroller::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.scroller::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Vue utility to hide uncompiled templates (Prevents flash of code on load) */
+[v-cloak] {
+    display: none;
+}
+
+/* Simple fade transition utilities */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+/* Optional: Animation for the Blockchain Receipt */
+@keyframes pulse-green {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.2); }
+    50% { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
+}
+
+.animate-pulse-green {
+    animation: pulse-green 2s infinite;
+}
