@@ -1,108 +1,190 @@
-const { createApp, ref, computed } = Vue;
+const { createApp } = Vue;
 const { jsPDF } = window.jspdf;
 
 createApp({
-    setup() {
-        const activeTab = ref('home'); 
-        
+    data() {
+        return {
+            activeTab: 'home',
+            
+            // --- ASSESSMENT DATA ---
+            assessmentSubmitted: false,
+            totalScore: 0,
+            scoreColor: '',
+            scoreMessage: '',
+            sectionScores: { security: 0, offences: 0 },
+            identifiedRisks: [],
+            questions: {
+                security: [
+                    { text: "Do you suppress marketing to users who have opted out (Opt-Out Registry)?", answer: null, risk: "Violation of Chapter 8 (Direct Marketing) rights." },
+                    { text: "Do you have proof of consent (Opt-In) for all new contacts?", answer: null, risk: "Section 69 Violation: Unsolicited electronic communication." },
+                    { text: "Are unsubscribe links functioning and tested monthly?", answer: null, risk: "Failure to provide means to object (Section 69)." }
+                ],
+                offences: [
+                    { text: "Is your Information Officer registered with the Regulator?", answer: null, risk: "Non-compliance with Officer duties (Section 55/56)." },
+                    { text: "Do you have a procedure to prevent obstruction of a Regulator search?", answer: null, risk: "Risk of criminal offence (Section 102 - Obstruction)." },
+                    { text: "Do you ensure no false evidence is given to the Regulator during audits?", answer: null, risk: "Risk of criminal offence (Section 104 - False Evidence)." }
+                ]
+            },
+
+            // --- MARKETING SANITIZER DATA ---
+            csvProcessed: false,
+            complianceScore: 0,
+            riskContacts: [],
+
+            // --- AUDITOR DATA ---
+            auditorQ1: null, // AI Auto Reject?
+            auditorQ2: null  // Human Review?
+        }
+    },
+    computed: {
+        // Logic for Decision Auditor (Chapter 8, Section 71)
+        auditorResult() {
+            if (this.auditorQ1 === 'yes') {
+                if (this.auditorQ2 === 'no') return 'violation'; // Automated decision without human view
+                if (this.auditorQ2 === 'yes') return 'compliant';
+            }
+            if (this.auditorQ1 === 'no') return 'compliant';
+            return null;
+        }
+    },
+    methods: {
+        // Helper to style sidebar buttons
+        navClass(tabName) {
+            const baseClasses = "flex items-center gap-3 w-full p-3 rounded-xl transition-all duration-200 group text-left";
+            if (this.activeTab === tabName) {
+                return `${baseClasses} bg-blue-600 text-white shadow-lg shadow-blue-900/20`;
+            }
+            return `${baseClasses} hover:bg-slate-800 text-slate-300 hover:text-white`;
+        },
+
         // --- ASSESSMENT LOGIC ---
-        const assessmentSubmitted = ref(false);
-        const questions = ref({
-            security: [
-                { text: "Do you verify consent before adding contacts? (S69)", answer: null, risk: "Risk of Spamming" },
-                { text: "Do emails include 'Unsubscribe' link? (S69)", answer: null, risk: "No Opt-Out" },
-                { text: "Do you purge opt-out contacts? (S69)", answer: null, risk: "Ignoring Rights" },
-                { text: "Automated calling consent? (S69)", answer: null, risk: "Illegal Calls" },
-                { text: "Human review for AI decisions? (S71)", answer: null, risk: "Automated Violation" },
-                { text: "Public directory notification? (S70)", answer: null, risk: "Directory Violation" }
-            ],
-            offences: [
-                { text: "Encrypt bank info files? (S105)", answer: null, risk: "Criminal Negligence" },
-                { text: "Process to allow warrants? (S102)", answer: null, risk: "Obstruction" },
-                { text: "Verify evidence truth? (S103)", answer: null, risk: "False Evidence" },
-                { text: "Staff trained on enforcement notices? (S100)", answer: null, risk: "Ignoring Notice" },
-                { text: "Whistleblower policy? (S104)", answer: null, risk: "No Reporting" },
-                { text: "Redact emails? (S105)", answer: null, risk: "Exposed Data" }
-            ]
-        });
+        submitAssessment() {
+            let scoreSec = 0;
+            let scoreOff = 0;
+            this.identifiedRisks = [];
 
-        const totalScore = ref(0);
+            // Calculate Security (Ch 8)
+            this.questions.security.forEach(q => {
+                if (q.answer === true) scoreSec += 2; // 2 points per correct answer
+                else if (q.answer === false) this.identifiedRisks.push(q.risk);
+            });
 
-        const submitAssessment = () => {
-            let score = 0;
-            questions.value.security.forEach(q => { if(q.answer) score++; });
-            questions.value.offences.forEach(q => { if(q.answer) score++; });
-            totalScore.value = Math.round((score / 12) * 100);
-            assessmentSubmitted.value = true;
-        };
+            // Calculate Offences (Ch 11)
+            this.questions.offences.forEach(q => {
+                if (q.answer === true) scoreOff += 2;
+                else if (q.answer === false) this.identifiedRisks.push(q.risk);
+            });
 
-        const generatePDF = () => {
+            // Total Calculations (Max score 12)
+            const total = scoreSec + scoreOff;
+            this.sectionScores = { security: scoreSec, offences: scoreOff };
+            this.totalScore = Math.round((total / 12) * 100);
+            
+            // Set UI Colors based on score
+            if (this.totalScore >= 80) {
+                this.scoreColor = 'text-green-600';
+                this.scoreMessage = "High Compliance Level";
+            } else if (this.totalScore >= 50) {
+                this.scoreColor = 'text-yellow-600';
+                this.scoreMessage = "Moderate Risk Detected";
+            } else {
+                this.scoreColor = 'text-red-600';
+                this.scoreMessage = "Critical Non-Compliance";
+            }
+
+            this.assessmentSubmitted = true;
+        },
+
+        generatePDF() {
             const doc = new jsPDF();
-            doc.text("POPI Checkup Report", 20, 20);
-            doc.text(`Score: ${totalScore.value}%`, 20, 30);
-            doc.save("report.pdf");
-        };
+            
+            // Header
+            doc.setFontSize(20);
+            doc.setTextColor(40, 40, 40);
+            doc.text("POPI Checkup Lite - Assessment Report", 20, 20);
+            
+            doc.setFontSize(12);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 30);
+            doc.text(`Overall Score: ${this.totalScore}%`, 20, 40);
 
-        // --- MARKETING & BLOCKCHAIN LOGIC ---
-        const csvProcessed = ref(false);
-        const riskContacts = ref([]);
-        const blockchainReceipt = ref(null);
+            // Scores
+            doc.setDrawColor(200, 200, 200);
+            doc.line(20, 45, 190, 45);
+            
+            doc.text("Chapter 8 (Security & Marketing): " + this.sectionScores.security + "/6", 20, 55);
+            doc.text("Chapter 11 (Offences): " + this.sectionScores.offences + "/6", 20, 65);
 
-        // Helper: Calculate SHA-256 Hash of a file
-        const computeHash = async (file) => {
-            const buffer = await file.arrayBuffer();
-            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        };
+            // Risks
+            doc.setFontSize(14);
+            doc.setTextColor(220, 53, 69); // Red
+            doc.text("Identified Risks:", 20, 85);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(60, 60, 60);
+            
+            let yPos = 95;
+            if (this.identifiedRisks.length === 0) {
+                doc.setTextColor(40, 167, 69); // Green
+                doc.text("No critical risks identified.", 20, yPos);
+            } else {
+                this.identifiedRisks.forEach(risk => {
+                    doc.text("• " + risk, 20, yPos);
+                    yPos += 10;
+                });
+            }
 
-        const handleFileUpload = async (event) => {
+            // Footer
+            doc.setFontSize(8);
+            doc.setTextColor(150);
+            doc.text("Generated by POPI Checkup Lite", 20, 280);
+
+            doc.save("POPIA-Assessment-Report.pdf");
+        },
+
+        // --- MARKETING SANITIZER LOGIC ---
+        handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            // 1. Generate Blockchain Hash
-            const hash = await computeHash(file);
-            blockchainReceipt.value = {
-                hash: hash,
-                timestamp: new Date().toISOString(),
-                status: 'ANCHORED'
-            };
-
-            // 2. Parse CSV
             Papa.parse(file, {
                 header: true,
                 skipEmptyLines: true,
                 complete: (results) => {
-                    riskContacts.value = results.data.filter(row => !row.Consent_Date || !row.Source);
-                    csvProcessed.value = true;
+                    this.processCSV(results.data);
                 }
             });
-        };
-        const complianceScore = computed(() => {
-            return csvProcessed.value ? Math.max(0, 100 - (riskContacts.value.length * 10)) : 0;
-        });
+        },
 
-        // --- AUDITOR LOGIC ---
-        const auditorQ1 = ref(null);
-        const auditorQ2 = ref(null);
-        const auditorResult = computed(() => {
-            if (auditorQ1.value === 'no') return 'compliant';
-            if (auditorQ1.value === 'yes') {
-                return auditorQ2.value === 'yes' ? 'compliant' : 'violation';
+        processCSV(data) {
+            let compliantCount = 0;
+            this.riskContacts = [];
+
+            data.forEach(row => {
+                // Mock Logic: Check for a 'Consent' column being 'true' or 'yes'
+                // If column doesn't exist, randomly flag for demo purposes if strictly needed, 
+                // but let's try to be smart first.
+                
+                const consent = row['Consent'] || row['consent'] || row['OptIn'];
+                const hasConsent = consent && (consent.toLowerCase() === 'yes' || consent.toLowerCase() === 'true' || consent === '1');
+                
+                if (hasConsent) {
+                    compliantCount++;
+                } else {
+                    this.riskContacts.push({
+                        Name: row['Name'] || row['name'] || 'Unknown',
+                        Email: row['Email'] || row['email'] || 'No Email'
+                    });
+                }
+            });
+
+            // If no rows found or empty file
+            if (data.length === 0) {
+                this.complianceScore = 0;
+            } else {
+                this.complianceScore = Math.round((compliantCount / data.length) * 100);
             }
-            return null;
-        });
-
-        const navClass = (tab) => {
-            return `w-full text-left px-4 py-3 rounded-lg transition-colors flex items-center gap-3 ${activeTab.value === tab ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'}`;
-        };
-
-        return {
-            activeTab, navClass,
-            questions, assessmentSubmitted, submitAssessment, totalScore, generatePDF,
-            handleFileUpload, csvProcessed, riskContacts, complianceScore,
-            auditorQ1, auditorQ2, auditorResult,
-            blockchainReceipt // Added to return
+            
+            this.csvProcessed = true;
         }
     }
 }).mount('#app');

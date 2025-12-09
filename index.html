@@ -3,287 +3,424 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POPI Checkup Lite</title>
+    <title>Compliance HUB</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased h-screen overflow-hidden">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased m-0 p-0">
 
-    <div id="app" v-cloak class="flex h-full">
+    <div id="app" v-cloak class="flex h-screen w-full overflow-hidden">
 
-        <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-xl z-20">
-            <div class="p-6 border-b border-slate-700">
+        <aside class="w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col shadow-2xl z-20 h-full">
+            <div class="p-6 border-b border-slate-800">
                 <div class="cursor-pointer" @click="activeTab = 'home'">
                     <h1 class="text-xl font-bold tracking-wider flex items-center gap-2">
                         <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                        POPI Checkup
+                        Compliance HUB
                     </h1>
-                    <span class="text-xs text-slate-400 uppercase tracking-widest mt-1 block">
-                        Lite Edition
-                    </span>
+                    <span class="text-xs text-slate-400 uppercase tracking-widest mt-1 block">Lite Edition</span>
                 </div>
             </div>
             
-            <nav class="flex-1 py-6 px-3 space-y-2">
+            <nav class="flex-1 py-6 px-3 space-y-2 overflow-y-auto">
                 <button @click="activeTab = 'home'" :class="navClass('home')">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                    <div><div class="font-medium">Dashboard</div><div class="text-[10px] opacity-70">Home</div></div>
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <div class="text-left"><div class="font-medium">Dashboard</div><div class="text-[10px] opacity-70">Home</div></div>
                 </button>
 
                 <button @click="activeTab = 'assessment'" :class="navClass('assessment')">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                    <div><div class="font-medium">Self Assessment</div><div class="text-[10px] opacity-70">Questionnaire & Report</div></div>
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    <div class="text-left"><div class="font-medium">Self Assessment</div><div class="text-[10px] opacity-70">Questionnaire & Report</div></div>
                 </button>
 
                 <button @click="activeTab = 'marketing'" :class="navClass('marketing')">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    <div><div class="font-medium">Marketing Sanitizer</div><div class="text-[10px] opacity-70">Chapter 8, S69</div></div>
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    <div class="text-left"><div class="font-medium">Marketing Sanitizer</div><div class="text-[10px] opacity-70">Chapter 8, S69</div></div>
                 </button>
 
                 <button @click="activeTab = 'auditor'" :class="navClass('auditor')">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <div><div class="font-medium">Decision Auditor</div><div class="text-[10px] opacity-70">Chapter 8, S71</div></div>
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div class="text-left"><div class="font-medium">Decision Auditor</div><div class="text-[10px] opacity-70">Chapter 8, S71</div></div>
                 </button>
                 
                 <button @click="activeTab = 'resources'" :class="navClass('resources')">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    <div><div class="font-medium">Resource Hub</div><div class="text-[10px] opacity-70">Premium & Info</div></div>
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <div class="text-left"><div class="font-medium">Resource Hub</div><div class="text-[10px] opacity-70">Premium & Info</div></div>
                 </button>
             </nav>
-
-            <div class="p-4 border-t border-slate-700 text-xs text-slate-500 text-center">
-                V3.0 (No-Auth)
-            </div>
         </aside>
 
-        <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
+        <main class="flex-1 bg-slate-50 h-full overflow-y-auto relative w-full">
             
-            <div v-if="activeTab === 'home'" class="max-w-6xl mx-auto animate-fade-in">
-                <header class="mb-10 text-center">
-                    <h2 class="text-4xl font-extrabold text-slate-800 mb-3">Welcome to POPI Checkup</h2>
-                    <p class="text-lg text-slate-500">Your toolkit for simplified POPIA compliance. Select a tool below to begin.</p>
-                </header>
+            <div class="container mx-auto px-6 py-10 md:px-12 md:py-12 max-w-7xl">
+            
+                <div v-if="activeTab === 'home'" class="animate-fade-in">
+                    <header class="mb-10 text-center max-w-3xl mx-auto">
+                        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4">Welcome to Compliance HUB</h2>
+                        <p class="text-lg text-slate-500">Your toolkit for simplified POPIA compliance. Select a tool below to begin.</p>
+                    </header>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-                    
-                    <div @click="activeTab = 'assessment'" class="bg-white p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 cursor-pointer group">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="bg-blue-100 p-3 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                            </div>
-                            <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full uppercase">Ready</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-slate-800 mb-2 group-hover:text-blue-600">Compliance Assessment</h3>
-                        <p class="text-slate-500 mb-4">Run a comprehensive self-assessment questionnaire covering Chapter 8 & 11 and generate a PDF report.</p>
-                        <div class="text-blue-600 font-semibold text-sm flex items-center group-hover:translate-x-1 transition-transform">
-                            Start Assessment <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                        </div>
-                    </div>
-
-                    <div @click="activeTab = 'marketing'" class="bg-white p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 cursor-pointer group">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="bg-indigo-100 p-3 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            </div>
-                            <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full uppercase">Ready</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-slate-800 mb-2 group-hover:text-indigo-600">Marketing Sanitizer</h3>
-                        <p class="text-slate-500 mb-4">Upload email CSV lists. Includes Blockchain Hashing for data integrity proof.</p>
-                        <div class="text-indigo-600 font-semibold text-sm flex items-center group-hover:translate-x-1 transition-transform">
-                            Clean List <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                        </div>
-                    </div>
-
-                    <div @click="activeTab = 'auditor'" class="bg-white p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 cursor-pointer group">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="bg-purple-100 p-3 rounded-lg text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            </div>
-                            <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full uppercase">Ready</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-slate-800 mb-2 group-hover:text-purple-600">Decision Auditor</h3>
-                        <p class="text-slate-500 mb-4">Verify if your automated decision-making processes (AI) comply with human intervention laws.</p>
-                        <div class="text-purple-600 font-semibold text-sm flex items-center group-hover:translate-x-1 transition-transform">
-                            Audit Logic <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                        </div>
-                    </div>
-
-                    <div @click="activeTab = 'resources'" class="bg-white p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 cursor-pointer group">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="bg-yellow-100 p-3 rounded-lg text-yellow-600 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            </div>
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full uppercase">Premium</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-slate-800 mb-2 group-hover:text-yellow-600">Resource Hub</h3>
-                        <p class="text-slate-500 mb-4">Access professional services, legal definitions (POPIA, PAIA), and upcoming webinars.</p>
-                        <div class="text-yellow-600 font-semibold text-sm flex items-center group-hover:translate-x-1 transition-transform">
-                            Explore Hub <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <div v-if="activeTab === 'assessment'" class="max-w-4xl mx-auto animate-fade-in">
-                <header class="mb-8 flex justify-between items-end">
-                    <div>
-                        <h2 class="text-3xl font-bold text-slate-800">Compliance Assessment</h2>
-                        <p class="text-slate-500 mt-2">Evaluate your standing against Chapter 8 (Direct Marketing) and Chapter 11 (Offences).</p>
-                    </div>
-                    <button v-if="assessmentSubmitted" @click="generatePDF" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow flex items-center gap-2 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        Export Report as PDF
-                    </button>
-                </header>
-
-                <div v-if="!assessmentSubmitted" class="space-y-8">
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div class="bg-blue-50 px-6 py-4 border-b border-blue-100">
-                            <h3 class="font-bold text-blue-900 text-lg">Section A: Security (Chapter 8 Focus)</h3>
-                            <p class="text-sm text-blue-700">Covering Direct Marketing, Directories, and Automated Decisions.</p>
-                        </div>
-                        <div class="p-6 grid gap-6">
-                            <div v-for="(q, index) in questions.security" :key="'sec-'+index" class="flex items-start justify-between gap-4 pb-4 border-b border-slate-50 last:border-0 last:pb-0">
-                                <p class="text-slate-700 font-medium text-sm flex-1">{{ q.text }}</p>
-                                <div class="flex gap-4 min-w-[120px]">
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" :name="'sec'+index" :value="true" v-model="q.answer" class="text-blue-600"> Yes</label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" :name="'sec'+index" :value="false" v-model="q.answer" class="text-blue-600"> No</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                        <div @click="activeTab = 'assessment'" class="bg-white p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 cursor-pointer group">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="bg-blue-100 p-3 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                                 </div>
+                                <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full uppercase">Ready</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-blue-600">Compliance Assessment</h3>
+                            <p class="text-slate-500 mb-4 text-sm leading-relaxed">Run a comprehensive self-assessment questionnaire covering Chapter 8 & 11 and generate a PDF report.</p>
+                            <div class="text-blue-600 font-semibold text-sm flex items-center group-hover:translate-x-1 transition-transform">
+                                Start Assessment <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div class="bg-indigo-50 px-6 py-4 border-b border-indigo-100">
-                            <h3 class="font-bold text-indigo-900 text-lg">Section B: Offences & Penalties (Chapter 11 Focus)</h3>
-                            <p class="text-sm text-indigo-700">Covering Obstruction, Account Numbers, and False Evidence.</p>
-                        </div>
-                        <div class="p-6 grid gap-6">
-                            <div v-for="(q, index) in questions.offences" :key="'off-'+index" class="flex items-start justify-between gap-4 pb-4 border-b border-slate-50 last:border-0 last:pb-0">
-                                <p class="text-slate-700 font-medium text-sm flex-1">{{ q.text }}</p>
-                                <div class="flex gap-4 min-w-[120px]">
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" :name="'off'+index" :value="true" v-model="q.answer" class="text-indigo-600"> Yes</label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" :name="'off'+index" :value="false" v-model="q.answer" class="text-indigo-600"> No</label>
+                        <div @click="activeTab = 'marketing'" class="bg-white p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 cursor-pointer group">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="bg-indigo-100 p-3 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                                 </div>
+                                <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full uppercase">Ready</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-indigo-600">Marketing Sanitizer</h3>
+                            <p class="text-slate-500 mb-4 text-sm leading-relaxed">Upload your email CSV lists to automatically flag contacts missing consent or source proof.</p>
+                            <div class="text-indigo-600 font-semibold text-sm flex items-center group-hover:translate-x-1 transition-transform">
+                                Clean List <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                            </div>
+                        </div>
+
+                        <div @click="activeTab = 'auditor'" class="bg-white p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 cursor-pointer group">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="bg-purple-100 p-3 rounded-lg text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full uppercase">Ready</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-purple-600">Decision Auditor</h3>
+                            <p class="text-slate-500 mb-4 text-sm leading-relaxed">Verify if your automated decision-making processes (AI) comply with human intervention laws.</p>
+                            <div class="text-purple-600 font-semibold text-sm flex items-center group-hover:translate-x-1 transition-transform">
+                                Audit Logic <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                            </div>
+                        </div>
+
+                        <div @click="activeTab = 'resources'" class="bg-white p-8 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 cursor-pointer group">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="bg-yellow-100 p-3 rounded-lg text-yellow-600 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full uppercase">Premium</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-yellow-600">Resource Hub</h3>
+                            <p class="text-slate-500 mb-4 text-sm leading-relaxed">Access professional services, legal definitions (POPIA, PAIA), and upcoming webinars.</p>
+                            <div class="text-yellow-600 font-semibold text-sm flex items-center group-hover:translate-x-1 transition-transform">
+                                Explore Hub <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                             </div>
                         </div>
                     </div>
-
-                    <button @click="submitAssessment" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-4 rounded-xl font-bold text-lg shadow-lg transition-transform active:scale-[0.99]">
-                        Generate Assessment Report
-                    </button>
                 </div>
 
-                <div v-else class="animate-fade-in space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-center">
-                            <div class="text-slate-500 font-medium text-sm uppercase tracking-wider mb-2">Overall Score</div>
-                            <div class="text-6xl font-black text-blue-600">{{ totalScore }}%</div>
-                        </div>
-                        
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-2">
-                            <h3 class="font-bold text-slate-800 mb-4">Assessment Complete</h3>
-                            <div class="mt-6 flex gap-2">
-                                <button @click="assessmentSubmitted = false" class="text-sm text-blue-600 hover:underline">Retake Assessment</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div v-if="activeTab === 'marketing'" class="max-w-5xl mx-auto animate-fade-in">
-                <header class="mb-8">
-                    <h2 class="text-3xl font-bold text-slate-800">Marketing List Sanitizer</h2>
-                    <p class="text-slate-500 mt-2">Audit your email lists for Section 69 compliance.</p>
-                </header>
-                
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-8">
-                    <div class="border-2 border-dashed border-slate-300 rounded-lg p-10 text-center hover:bg-slate-50 transition-colors cursor-pointer relative">
-                        <input type="file" @change="handleFileUpload" accept=".csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                        <div class="text-slate-400 mb-3"><svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg></div>
-                        <p class="font-medium text-slate-700">Click to upload CSV</p>
-                    </div>
-                </div>
-
-                <div v-if="blockchainReceipt" class="bg-slate-800 text-white p-6 rounded-xl shadow-lg border border-slate-700 mb-8 animate-fade-in">
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="bg-green-500/20 p-3 rounded-full text-green-400 border border-green-500/30">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
-                        </div>
+                <div v-if="activeTab === 'assessment'" class="max-w-4xl mx-auto animate-fade-in pb-20">
+                    <header class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                         <div>
-                            <h3 class="font-bold text-lg">Blockchain Immutable Record</h3>
-                            <p class="text-slate-400 text-xs">Data integrity secured via SHA-256 Hashing. This creates a permanent proof of data arrival.</p>
+                            <h2 class="text-3xl font-bold text-slate-800">Compliance Assessment</h2>
+                            <p class="text-slate-500 mt-2">Evaluate your standing against (Direct Marketing) and (Offences).</p>
                         </div>
+                        <button v-if="assessmentSubmitted" @click="generatePDF" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg shadow-md flex items-center gap-2 transition-colors font-medium">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Export PDF Report
+                        </button>
+                    </header>
+
+                    <div v-if="!assessmentSubmitted" class="space-y-8">
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="bg-blue-50 px-6 py-4 border-b border-blue-100">
+                                <h3 class="font-bold text-blue-900 text-lg">Section A: Security </h3>
+                                <p class="text-sm text-blue-700">Covering Direct Marketing, Directories, and Automated Decisions.</p>
+                            </div>
+                            <div class="p-6 grid gap-6">
+                                <div v-for="(q, index) in questions.security" :key="'sec-'+index" class="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-4 border-b border-slate-50 last:border-0 last:pb-0">
+                                    <p class="text-slate-700 font-medium text-sm flex-1 leading-relaxed">{{ q.text }}</p>
+                                    <div class="flex gap-6 min-w-[120px] pt-1">
+                                        <label class="flex items-center gap-2 cursor-pointer select-none hover:text-blue-600"><input type="radio" :name="'sec'+index" :value="true" v-model="q.answer" class="text-blue-600 w-4 h-4"> Yes</label>
+                                        <label class="flex items-center gap-2 cursor-pointer select-none hover:text-blue-600"><input type="radio" :name="'sec'+index" :value="false" v-model="q.answer" class="text-blue-600 w-4 h-4"> No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="bg-indigo-50 px-6 py-4 border-b border-indigo-100">
+                                <h3 class="font-bold text-indigo-900 text-lg">Section B: Offences & Penalties </h3>
+                                <p class="text-sm text-indigo-700">Covering Obstruction, Account Numbers, and False Evidence.</p>
+                            </div>
+                            <div class="p-6 grid gap-6">
+                                <div v-for="(q, index) in questions.offences" :key="'off-'+index" class="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-4 border-b border-slate-50 last:border-0 last:pb-0">
+                                    <p class="text-slate-700 font-medium text-sm flex-1 leading-relaxed">{{ q.text }}</p>
+                                    <div class="flex gap-6 min-w-[120px] pt-1">
+                                        <label class="flex items-center gap-2 cursor-pointer select-none hover:text-indigo-600"><input type="radio" :name="'off'+index" :value="true" v-model="q.answer" class="text-indigo-600 w-4 h-4"> Yes</label>
+                                        <label class="flex items-center gap-2 cursor-pointer select-none hover:text-indigo-600"><input type="radio" :name="'off'+index" :value="false" v-model="q.answer" class="text-indigo-600 w-4 h-4"> No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button @click="submitAssessment" class="w-full bg-slate-800 hover:bg-slate-900 text-white py-4 rounded-xl font-bold text-lg shadow-lg transition-all active:scale-[0.99] mb-10">
+                            Generate Assessment Report
+                        </button>
                     </div>
-                    <div class="font-mono text-xs bg-slate-900 p-4 rounded border border-slate-700 break-all space-y-2">
-                        <div><span class="text-blue-400 font-bold">DIGITAL FINGERPRINT (SHA-256):</span><br>{{ blockchainReceipt.hash }}</div>
-                        <div><span class="text-blue-400 font-bold">TIMESTAMP:</span> {{ blockchainReceipt.timestamp }}</div>
-                        <div><span class="text-blue-400 font-bold">BLOCK_STATUS:</span> <span class="text-green-400 font-bold bg-green-900/30 px-2 py-0.5 rounded">ANCHORED</span></div>
+
+                    <div v-else class="animate-fade-in space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-center">
+                                <div class="text-slate-500 font-medium text-sm uppercase tracking-wider mb-2">Overall Score</div>
+                                <div :class="['text-6xl font-black tracking-tight', scoreColor]">{{ totalScore }}%</div>
+                                <div class="mt-2 text-sm font-bold uppercase tracking-wide" :class="scoreColor">{{ scoreMessage }}</div>
+                            </div>
+                            
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-2">
+                                <h3 class="font-bold text-slate-800 mb-4 text-lg">Breakdown by Chapter</h3>
+                                <div class="space-y-6">
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-2">
+                                            <span class="font-bold text-slate-700">Security (Ch 8)</span>
+                                            <span class="font-bold text-slate-900">{{ sectionScores.security }}/6</span>
+                                        </div>
+                                        <div class="h-4 bg-slate-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-blue-500 transition-all duration-1000 ease-out" :style="{width: (sectionScores.security/6)*100 + '%'}"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-2">
+                                            <span class="font-bold text-slate-700">Offences (Ch 11)</span>
+                                            <span class="font-bold text-slate-900">{{ sectionScores.offences }}/6</span>
+                                        </div>
+                                        <div class="h-4 bg-slate-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-indigo-500 transition-all duration-1000 ease-out" :style="{width: (sectionScores.offences/6)*100 + '%'}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-6 flex justify-end">
+                                    <button @click="assessmentSubmitted = false" class="text-sm text-slate-500 hover:text-blue-600 font-medium flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        Retake Assessment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200">
+                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                                <h3 class="font-bold text-slate-800">Priority Action Items</h3>
+                            </div>
+                            <div class="p-6">
+                                <ul v-if="identifiedRisks.length > 0" class="space-y-3">
+                                    <li v-for="(risk, i) in identifiedRisks" :key="i" class="flex items-start gap-3 p-4 bg-red-50 rounded-lg border border-red-100">
+                                        <svg class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                        <span class="text-sm text-red-900 font-medium">{{ risk }}</span>
+                                    </li>
+                                </ul>
+                                <div v-else class="text-center py-8">
+                                    <svg class="w-16 h-16 text-green-500 mx-auto mb-4 bg-green-100 p-3 rounded-full" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <p class="text-green-800 font-bold text-lg">Compliance Audit Passed</p>
+                                    <p class="text-slate-500 text-sm">No critical risks identified in this questionnaire.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div v-if="csvProcessed" class="space-y-8">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 text-center">
-                            <div class="text-sm text-slate-500 font-medium">Compliance Score</div>
-                            <div class="text-5xl font-extrabold text-blue-600">{{ complianceScore }}%</div>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-2">
-                            <h3 class="font-bold text-lg mb-1">Report</h3>
-                            <p class="text-sm text-slate-600">{{ riskContacts.length }} contacts missing consent.</p>
+                <div v-if="activeTab === 'marketing'" class="max-w-5xl mx-auto animate-fade-in pb-20">
+                    <header class="mb-8">
+                        <h2 class="text-3xl font-bold text-slate-800">Marketing List Sanitizer</h2>
+                        <p class="text-slate-500 mt-2">Audit your email lists for Section 69 compliance.</p>
+                    </header>
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-8">
+                        <div class="border-2 border-dashed border-slate-300 rounded-lg p-10 text-center hover:bg-slate-50 transition-colors cursor-pointer relative group">
+                            <input type="file" @change="handleFileUpload" accept=".csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                            <div class="text-slate-400 mb-3 group-hover:text-blue-500 transition-colors">
+                                <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            </div>
+                            <p class="font-medium text-slate-700 text-lg">Drop your CSV file here</p>
+                            <p class="text-sm text-slate-400 mt-2">Requires columns: 'Name', 'Email', 'Consent' (Yes/No)</p>
                         </div>
                     </div>
-                    <div v-if="riskContacts.length > 0" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div class="bg-red-50 border-b border-red-100 p-4 font-bold text-red-800">At Risk Contacts</div>
-                        <div class="overflow-x-auto max-h-64 scroller">
-                            <table class="w-full text-sm text-left">
-                                <thead class="text-xs text-slate-500 uppercase bg-slate-50 sticky top-0"><tr><th class="px-6 py-3">Name</th><th class="px-6 py-3">Email</th><th class="px-6 py-3">Issue</th></tr></thead>
-                                <tbody><tr v-for="row in riskContacts" class="bg-white border-b"><td class="px-6 py-3">{{row.Name}}</td><td class="px-6 py-3">{{row.Email}}</td><td class="px-6 py-3 text-red-600 font-bold">MISSING CONSENT</td></tr></tbody>
-                            </table>
+                    
+                    <div v-if="csvProcessed" class="space-y-8 animate-fade-in">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-center">
+                                <div class="text-sm text-slate-500 font-medium uppercase tracking-wider">Compliance Score</div>
+                                <div class="text-5xl font-extrabold text-blue-600 mt-2">{{ complianceScore }}%</div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-2 flex flex-col justify-center">
+                                <h3 class="font-bold text-lg mb-1 text-slate-800">Scan Results</h3>
+                                <p class="text-slate-600">We scanned your list and found <strong class="text-red-600">{{ riskContacts.length }} contacts</strong> missing proper consent.</p>
+                            </div>
+                        </div>
+                        <div v-if="riskContacts.length > 0" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="bg-red-50 border-b border-red-100 p-4 font-bold text-red-800 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                At Risk Contacts
+                            </div>
+                            <div class="overflow-x-auto max-h-80 scroller">
+                                <table class="w-full text-sm text-left">
+                                    <thead class="text-xs text-slate-500 uppercase bg-slate-50 sticky top-0 border-b border-slate-200">
+                                        <tr>
+                                            <th class="px-6 py-4 font-bold">Name</th>
+                                            <th class="px-6 py-4 font-bold">Email</th>
+                                            <th class="px-6 py-4 font-bold">Issue Detected</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        <tr v-for="row in riskContacts" class="bg-white hover:bg-red-50 transition-colors">
+                                            <td class="px-6 py-3 font-medium text-slate-700">{{row.Name}}</td>
+                                            <td class="px-6 py-3 text-slate-600">{{row.Email}}</td>
+                                            <td class="px-6 py-3 text-red-600 font-bold text-xs uppercase tracking-wide">
+                                                <span class="bg-red-100 px-2 py-1 rounded">Missing Consent</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <div v-if="activeTab === 'auditor'" class="max-w-3xl mx-auto animate-fade-in pb-20">
+                    <header class="mb-8">
+                        <h2 class="text-3xl font-bold text-slate-800">Automated Decision Auditor</h2>
+                        <p class="text-slate-500 mt-2">Check compliance with Section 71 regarding AI decisions.</p>
+                    </header>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 space-y-8">
+                        <div class="space-y-4">
+                            <p class="font-bold text-lg text-slate-800">1. Do you use algorithms/AI to automatically reject applications (e.g., loans, jobs) without a human looking at them?</p>
+                            <div class="flex gap-6">
+                                <label class="flex items-center gap-2 cursor-pointer p-3 border rounded-lg hover:bg-slate-50 w-full">
+                                    <input type="radio" value="yes" v-model="auditorQ1" class="text-purple-600 w-5 h-5"> 
+                                    <span class="font-medium">Yes, we do.</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer p-3 border rounded-lg hover:bg-slate-50 w-full">
+                                    <input type="radio" value="no" v-model="auditorQ1" class="text-purple-600 w-5 h-5"> 
+                                    <span class="font-medium">No, we don't.</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div v-if="auditorQ1 === 'yes'" class="space-y-4 animate-fade-in">
+                            <p class="font-bold text-lg text-slate-800">2. If a user complains, do you have a process for a human to review and overturn that decision?</p>
+                            <div class="flex gap-6">
+                                <label class="flex items-center gap-2 cursor-pointer p-3 border rounded-lg hover:bg-slate-50 w-full">
+                                    <input type="radio" value="yes" v-model="auditorQ2" class="text-purple-600 w-5 h-5"> 
+                                    <span class="font-medium">Yes, we review it.</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer p-3 border rounded-lg hover:bg-slate-50 w-full">
+                                    <input type="radio" value="no" v-model="auditorQ2" class="text-purple-600 w-5 h-5"> 
+                                    <span class="font-medium">No, the AI is final.</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div v-if="auditorResult" class="mt-6 pt-6 border-t border-slate-100 animate-fade-in">
+                            <div v-if="auditorResult === 'violation'" class="bg-red-50 text-red-900 p-6 rounded-lg border border-red-100 flex gap-4">
+                                <svg class="w-8 h-8 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <div>
+                                    <h4 class="font-bold text-lg mb-1">Compliance Violation Detected</h4>
+                                    <p class="text-sm">Section 71 of POPIA strictly requires human intervention. You cannot make purely automated decisions that affect legal rights without offering a way to appeal to a human.</p>
+                                </div>
+                            </div>
+                            <div v-if="auditorResult === 'compliant'" class="bg-green-50 text-green-900 p-6 rounded-lg border border-green-100 flex gap-4">
+                                <svg class="w-8 h-8 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <div>
+                                    <h4 class="font-bold text-lg mb-1">You are Compliant</h4>
+                                    <p class="text-sm">Your process appears to meet the requirements of Section 71, provided the human review is meaningful and not just a "rubber stamp."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="activeTab === 'resources'" class="max-w-5xl mx-auto animate-fade-in pb-20">
+                    <header class="mb-8">
+                        <h2 class="text-3xl font-bold text-slate-800">Resource Hub</h2>
+                        <p class="text-slate-500 mt-2">Professional services, legal information, and premium features.</p>
+                    </header>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-xl shadow-lg p-8 relative overflow-hidden flex flex-col justify-between">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                                <svg class="w-48 h-48" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold mb-3 flex items-center gap-3">
+                                    <span class="bg-yellow-500 text-slate-900 text-xs font-bold px-2 py-1 rounded">PREMIUM</span>
+                                    Full Access
+                                </h3>
+                                <p class="text-slate-300 mb-6 text-sm leading-relaxed">Unlock the comprehensive POPI Checkup suite. Get coverage for all 12 Chapters of the Act, not just the basics.</p>
+                                <ul class="space-y-3 mb-8 text-sm">
+                                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Complete Assessment (All Chapters)</li>
+                                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Compliance Events & Webinars</li>
+                                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Unlimited Reports & Exports</li>
+                                </ul>
+                            </div>
+                            <button class="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold py-3 px-6 rounded-lg w-full transition-colors shadow-lg">Upgrade to Premium</button>
+                        </div>
+
+                        <div class="flex flex-col gap-6">
+                            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex-1">
+                                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                    Professional Services
+                                </h3>
+                                <div class="space-y-3">
+                                    <a href="#" class="block p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors group">
+                                        <div class="font-bold text-slate-800 text-sm group-hover:text-blue-600">Cyber Security Experts</div>
+                                        <div class="text-xs text-slate-500 mt-1">Penetration testing & data encryption setup.</div>
+                                    </a>
+                                    <a href="#" class="block p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors group">
+                                        <div class="font-bold text-slate-800 text-sm group-hover:text-blue-600">Legal Advisors</div>
+                                        <div class="text-xs text-slate-500 mt-1">Contract review & Info Officer registration.</div>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex-1">
+                                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    Upcoming Events
+                                </h3>
+                                <div class="space-y-4">
+                                    <div class="flex gap-4 items-center">
+                                        <div class="bg-purple-100 text-purple-800 font-bold rounded p-2 text-center min-w-[50px] text-xs leading-tight">
+                                            <div class="text-lg">15</div>
+                                            <div>OCT</div>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-slate-800 text-sm">POPIA for HR Managers</div>
+                                            <div class="text-xs text-slate-500">Webinar • 10:00 AM</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-4 items-center">
+                                        <div class="bg-purple-100 text-purple-800 font-bold rounded p-2 text-center min-w-[50px] text-xs leading-tight">
+                                            <div class="text-lg">22</div>
+                                            <div>OCT</div>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-slate-800 text-sm">Cyber Sec Bootcamp</div>
+                                            <div class="text-xs text-slate-500">Workshop • 09:00 AM</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-
-            <div v-if="activeTab === 'auditor'" class="max-w-3xl mx-auto animate-fade-in">
-                <header class="mb-8"><h2 class="text-3xl font-bold text-slate-800">Automated Decision Auditor</h2></header>
-                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 space-y-6">
-                    <div>
-                        <p class="font-bold mb-2">1. Do you use AI to auto-reject applications?</p>
-                        <div class="flex gap-4"><label class="flex gap-2"><input type="radio" value="yes" v-model="auditorQ1"> Yes</label><label class="flex gap-2"><input type="radio" value="no" v-model="auditorQ1"> No</label></div>
-                    </div>
-                    <div v-if="auditorQ1 === 'yes'">
-                        <p class="font-bold mb-2">2. Is there a human review step?</p>
-                        <div class="flex gap-4"><label class="flex gap-2"><input type="radio" value="yes" v-model="auditorQ2"> Yes</label><label class="flex gap-2"><input type="radio" value="no" v-model="auditorQ2"> No</label></div>
-                    </div>
-                    <div v-if="auditorResult === 'violation'" class="bg-red-50 text-red-800 p-4 rounded font-bold">Violation: Section 71 requires human intervention.</div>
-                    <div v-if="auditorResult === 'compliant'" class="bg-green-50 text-green-800 p-4 rounded font-bold">Compliant.</div>
-                </div>
-            </div>
-
-            <div v-if="activeTab === 'resources'" class="max-w-5xl mx-auto animate-fade-in">
-                <header class="mb-8">
-                    <h2 class="text-3xl font-bold text-slate-800">Resource Hub</h2>
-                    <p class="text-slate-500 mt-2">Professional services, legal information, and premium features.</p>
-                </header>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-xl shadow-lg p-8 relative overflow-hidden">
-                        <h3 class="text-2xl font-bold mb-2 flex items-center gap-2">
-                            <span class="bg-yellow-500 text-slate-900 text-xs font-bold px-2 py-1 rounded">PREMIUM</span>
-                            Full Access
-                        </h3>
-                        <p class="text-slate-300 mb-6">Unlock the comprehensive POPI Checkup suite for full legal compliance.</p>
-                        <button class="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold py-3 px-6 rounded-lg w-full transition-colors">Upgrade to Premium</button>
-                    </div>
-                </div>
-            </div>
-
         </main>
     </div>
 
