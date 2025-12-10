@@ -160,24 +160,26 @@ createApp({
             this.riskContacts = [];
 
             data.forEach(row => {
-                // Mock Logic: Check for a 'Consent' column being 'true' or 'yes'
-                // If column doesn't exist, randomly flag for demo purposes if strictly needed, 
-                // but let's try to be smart first.
-                
+                // 1. Check Consent
                 const consent = row['Consent'] || row['consent'] || row['OptIn'];
                 const hasConsent = consent && (consent.toLowerCase() === 'yes' || consent.toLowerCase() === 'true' || consent === '1');
                 
+                // 2. Capture Source (New Logic)
+                const source = row['Source'] || row['source'] || 'Unknown Source';
+
                 if (hasConsent) {
                     compliantCount++;
                 } else {
+                    // 3. Add to Risk List with Source
                     this.riskContacts.push({
                         Name: row['Name'] || row['name'] || 'Unknown',
-                        Email: row['Email'] || row['email'] || 'No Email'
+                        Email: row['Email'] || row['email'] || 'No Email',
+                        Source: source // <--- New Field
                     });
                 }
             });
 
-            // If no rows found or empty file
+            // Calculate Score
             if (data.length === 0) {
                 this.complianceScore = 0;
             } else {

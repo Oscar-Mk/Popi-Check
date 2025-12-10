@@ -273,6 +273,7 @@
                                         <tr>
                                             <th class="px-6 py-4 font-bold">Name</th>
                                             <th class="px-6 py-4 font-bold">Email</th>
+                                            <th class="px-6 py-4 font-bold">Origin / Source</th>
                                             <th class="px-6 py-4 font-bold">Issue Detected</th>
                                         </tr>
                                     </thead>
@@ -280,6 +281,7 @@
                                         <tr v-for="row in riskContacts" class="bg-white hover:bg-red-50 transition-colors">
                                             <td class="px-6 py-3 font-medium text-slate-700">{{row.Name}}</td>
                                             <td class="px-6 py-3 text-slate-600">{{row.Email}}</td>
+                                            <td class="px-6 py-3 text-slate-500 italic">{{row.Source}}</td>
                                             <td class="px-6 py-3 text-red-600 font-bold text-xs uppercase tracking-wide">
                                                 <span class="bg-red-100 px-2 py-1 rounded">Missing Consent</span>
                                             </td>
